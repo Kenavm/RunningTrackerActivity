@@ -1,6 +1,6 @@
-package com.codecool.RunningActivityTracker.security;
+package com.codecool.runningactivitytracker.security;
 
-import com.codecool.RunningActivityTracker.model.User;
+import com.codecool.runningactivitytracker.model.User;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -19,9 +19,9 @@ public class TokenService {
     public String generateToken(User user) {
         StringBuilder tokenBuilder = new StringBuilder();
 
-        tokenBuilder.append(user.getUsername());
+        tokenBuilder.append(user.getEmail());
         tokenBuilder.append(";");
-        tokenBuilder.append(this.passwordEncoder.encode(this.secret + user.getUsername()));
+        tokenBuilder.append(this.passwordEncoder.encode(this.secret + user.getEmail()));
 
         return tokenBuilder.toString();
     }

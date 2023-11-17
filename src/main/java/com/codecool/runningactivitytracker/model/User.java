@@ -1,25 +1,30 @@
-package com.codecool.RunningActivityTracker.model;
+package com.codecool.runningactivitytracker.model;
 
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "_user")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue
     private long id;
     @Column(unique = true)
-    private String username;
+    private String email;
     private String password;
     @ElementCollection(fetch = FetchType.EAGER)
-    private Set<String> authorities;
+    private Set<Role> authorities;
 
-    public User(long id, String username, String password, Set<String> authorities) {
-        this.id = id;
-        this.username = username;
+    public User(String email, String password, Set<Role> authorities) {
+        this.email = email;
         this.password = password;
         this.authorities = authorities;
     }
@@ -27,12 +32,9 @@ public class User {
     public User() {
     }
 
-    public String getPassword() {
-        return this.password;
-    }
 
-    public String getUsername() {
-        return this.username;
+    public String getEmail() {
+        return this.email;
     }
 
     public void setPassword(String newPassword) {
@@ -47,11 +49,45 @@ public class User {
         this.id = id;
     }
 
-    public Set<String> getAuthorities() {
-        return authorities;
+    public void setAuthorities(Set<Role> authorities) {
+        this.authorities = authorities;
     }
 
-    public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities;
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities.stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toString()))
+                .collect(Collectors.toList());
+    }
+
+
+    @Override
+    public String getPassword() {
+        return password;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
